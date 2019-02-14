@@ -1,6 +1,6 @@
 var praiseBang = {
-    check: function () {
-        return praiseBang.newOP.func();
+    check: function (s) {
+        return /[\d]{5,10}/.test(s);
     },
     operate: "asdsad"
 };

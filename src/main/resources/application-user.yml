@@ -1,5 +1,6 @@
 cqRobot:
-  port: 25303
+  port: 6700
 
-
-jsPath:
+user:
+  groupID: 177203593
+  jspath: classpath:js

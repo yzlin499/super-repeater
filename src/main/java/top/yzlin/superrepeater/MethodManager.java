@@ -2,6 +2,8 @@ package top.yzlin.superrepeater;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import top.yzlin.tools.Tools;
 
@@ -21,6 +23,12 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
                 Tools.sleep(500);
             }
         });
+    }
+
+    @Autowired
+    @Qualifier("methodEventList")
+    public boolean addAllEvent(List<MethodEvent> methodEvents) {
+        return eventList.addAll(methodEvents);
     }
 
     public boolean addEvent(MethodEvent methodEvent) {
