@@ -14,15 +14,21 @@ public class JSFile {
     @Value("${user.jspath}")
     public void setJspath(String jspath) {
         try {
-            files = ResourceUtils.getFile(jspath).listFiles(pathname -> {
-                if (pathname.isFile()) {
-                    String fileName = pathname.getName();
-                    String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
-                    return "JS".equals(suffix);
-                } else {
-                    return false;
-                }
-            });
+            File path = ResourceUtils.getFile(jspath);
+            if (path.exists()) {
+                files = path.listFiles(pathname -> {
+                    if (pathname.isFile()) {
+                        String fileName = pathname.getName();
+                        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
+                        return "JS".equals(suffix);
+                    } else {
+                        return false;
+                    }
+                });
+            } else {
+                path.mkdirs();
+                files = new File[0];
+            }
         } catch (FileNotFoundException e) {
             files = new File[0];
             e.printStackTrace();

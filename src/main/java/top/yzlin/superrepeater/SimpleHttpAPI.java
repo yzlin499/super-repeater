@@ -8,7 +8,8 @@ import java.util.function.Consumer;
 
 
 public class SimpleHttpAPI {
-    private JSONWebSocketClient client;
+    private JSONWebSocketClient eventClient;
+    private JSONWebSocketClient apiClient;
 
 
     public SimpleHttpAPI(int port) {
@@ -20,12 +21,14 @@ public class SimpleHttpAPI {
     }
 
     public SimpleHttpAPI(String wsPath, String port) {
-        client = new JSONWebSocketClient(wsPath + ':' + port + "/api/");
-        client.connect();
+        eventClient = new JSONWebSocketClient(wsPath + ':' + port + "/event/");
+        apiClient = new JSONWebSocketClient(wsPath + ':' + port + "/api/");
+        eventClient.connect();
+        apiClient.connect();
     }
 
     public void setOnMessage(Consumer<JSONObject> onMessage) {
-        client.setOnMessage(onMessage);
+        eventClient.setOnMessage(onMessage);
     }
 
     private JSONObject makeJSON(String action, JSONObject params) {
@@ -48,7 +51,7 @@ public class SimpleHttpAPI {
 
     private void sendMsg(String id, String msg, String msgType, String key) {
         if (id != null && msg != null) {
-            client.send(makeJSON(msgType,
+            apiClient.send(makeJSON(msgType,
                     new JSONObject()
                             .fluentPut(key, id)
                             .fluentPut("message", msg)).toString());
@@ -61,7 +64,9 @@ public class SimpleHttpAPI {
 
     public void close() {
         destruct();
-        client.close();
-        client = null;
+        apiClient.close();
+        eventClient.close();
+        apiClient = null;
+        eventClient = null;
     }
 }

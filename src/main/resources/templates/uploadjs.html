@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <style>
+        * {
+            margin: 0;
+        }
+
+        form fieldset {
+            height: 80%;
+            width: 80%;
+            margin: 50px auto;
+        }
+
+        form fieldset div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<form action="fileUpload" method="post" enctype="multipart/form-data">
+    <fieldset>
+        <legend>开始赞美棒哥</legend>
+        <div>
+            <label>文件名：<input type="text" title="文件名" name="onlyName"></label>
+        </div>
+        <div>
+            <label>密钥：<input type="password" title="密钥" name="privateKey"></label>
+        </div>
+        <div>
+            <p>选择文件: <input type="file" name="fileName" accept=".js"/></p>
+        </div>
+        <div>
+            <input type="submit" value="提交">
+        </div>
+    </fieldset>
+</form>
+</body>
+</html>

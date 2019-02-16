@@ -3,4 +3,5 @@ cqRobot:
 
 user:
   groupID: 177203593
-  jspath: classpath:js
+  jspath: d:/qqq
+  privateKey: praiseBang

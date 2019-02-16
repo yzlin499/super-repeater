@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 @Configuration
 public class MainConfig {
-    private MethodManager methodManager;
     private JSFile jsFile;
     private JSParse jsParse;
 
@@ -30,18 +29,14 @@ public class MainConfig {
     }
 
     @Autowired
-    public void setMethodManager(MethodManager methodManager) {
-        this.methodManager = methodManager;
-    }
-
-    @Autowired
     public void setJsFile(JSFile jsFile) {
         this.jsFile = jsFile;
     }
 
     @Bean
     @Scope("singleton")
-    public SimpleHttpAPI cqRobot(@Value("${cqRobot.port}") int port) {
+    @Autowired
+    public SimpleHttpAPI cqRobot(@Value("${cqRobot.port}") int port, MethodManager methodManager) {
         SimpleHttpAPI s = new SimpleHttpAPI(port);
         s.setOnMessage(methodManager);
         return s;

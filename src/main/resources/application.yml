@@ -1,4 +1,19 @@
 spring:
+  mvc:
+    view:
+      prefix: "classpath:/templates/"
+      suffix: ".html"
   profiles:
     include: user
+  servlet:
+    multipart:
+      max-file-size: 10KB
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
+server:
+  tomcat:
+    uri-encoding: UTF-8

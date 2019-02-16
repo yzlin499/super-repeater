@@ -34,17 +34,23 @@ public class JSParse {
     }
 
     public MethodEvent parse(File file) throws FileNotFoundException, ScriptException {
+        //实例化一个操作方法
+        JSMethodEvent jsMethodEvent = new JSMethodEvent();
         ScriptEngine engine = manager.getEngineByName("javascript");
         FileReader reader = new FileReader(file);
+
         engine.eval(reader);
         //获取最外层的赞美棒哥节点
         ScriptObjectMirror s = (ScriptObjectMirror) engine.get("praiseBang");
+        if (s == null) {
+            return null;
+        }
         //注入机器人的操作函数
-        s.put("robot", simpleHttpAPI);
+        injectionProperties(s);
+
         //获取检查节点
         Object check = s.get("check");
 
-        JSMethodEvent jsMethodEvent = new JSMethodEvent();
         //为方法设置检查方法
         //如果值为数字或者字符串则进行值对比，如果为数组则判断数组的值，如果为函数着将函数的返回结果作为判断
         if (check instanceof Integer || check instanceof String) {
@@ -87,5 +93,10 @@ public class JSParse {
             return null;
         }
         return jsMethodEvent;
+    }
+
+    private void injectionProperties(ScriptObjectMirror s) {
+        s.put("robot", simpleHttpAPI);
+        s.put("groupID", groupID);
     }
 }

@@ -1,6 +1,8 @@
 var praiseBang = {
-    check: function (s) {
-        return /[\d]{5,10}/.test(s);
+    check: function (msg) {
+        return msg.message.length === 10;
     },
-    operate: "asdsad"
+    operate: function () {
+        praiseBang.robot.sendPersonMsg("499680328", "asdsadasdas");
+    }
 };
