@@ -9,16 +9,20 @@ import java.util.Date;
 public class LogOperate {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("[MM-dd HH:mm:ss] ");
     private FileWriter log;
+    private File file;
 
     public LogOperate(File file) {
-        try {
-            log = new FileWriter(file, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.file = file;
     }
 
     public void log(Object text) {
+        if (log == null) {
+            try {
+                log = new FileWriter(file, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         String t = dateFormat.format(new Date()) + text.toString();
         try {
             log.write(t);
@@ -31,9 +35,12 @@ public class LogOperate {
 
     public void close() {
         try {
-            log.close();
+            if (log != null) {
+                log.close();
+                log = null;
+            }
+            file = null;
             dateFormat = null;
-            log = null;
         } catch (IOException e) {
             e.printStackTrace();
         }

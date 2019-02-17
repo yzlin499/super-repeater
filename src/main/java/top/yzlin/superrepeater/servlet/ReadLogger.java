@@ -23,7 +23,6 @@ public class ReadLogger {
     @RequestMapping("/log/{name}")
     public ResponseEntity<FileSystemResource> getLog(@PathVariable("name") String name) throws FileNotFoundException {
         File f = loggerManager.getLogFile(name + ".js");
-
         return ResponseEntity.ok().body(new FileSystemResource(f));
     }
 }

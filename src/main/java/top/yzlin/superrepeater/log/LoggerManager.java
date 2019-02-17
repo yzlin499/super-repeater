@@ -1,5 +1,6 @@
 package top.yzlin.superrepeater.log;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class LoggerManager {
+public class LoggerManager implements DisposableBean {
     private File logPath;
     private Map<String, LogOperate> logOperateMap = new HashMap<>();
 
@@ -49,4 +50,11 @@ public class LoggerManager {
         return new LogOperate(new File(logPath, name + ".log"));
     }
 
+    @Override
+    public void destroy() throws Exception {
+        logOperateMap.forEach((k, v) -> v.close());
+        logOperateMap.clear();
+        logOperateMap = null;
+        logPath = null;
+    }
 }

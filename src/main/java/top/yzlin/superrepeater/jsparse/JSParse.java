@@ -13,9 +13,7 @@ import top.yzlin.superrepeater.log.LoggerManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -49,14 +47,16 @@ public class JSParse {
         this.groupID = groupID;
     }
 
-    public MethodEvent parse(File file) throws FileNotFoundException, ScriptException {
+    public MethodEvent parse(File file) throws FileNotFoundException, ScriptException, UnsupportedEncodingException {
         //实例化一个操作方法
         JSMethodEvent jsMethodEvent = new JSMethodEvent();
         jsMethodEvent.setName(file.getName());
         ScriptEngine engine = manager.getEngineByName("javascript");
-        FileReader reader = new FileReader(file);
 
-        engine.eval(reader);
+        FileInputStream fis = new FileInputStream(file);
+        InputStreamReader isr = new InputStreamReader(fis, "utf-8");
+
+        engine.eval(isr);
         //获取最外层的赞美棒哥节点
         ScriptObjectMirror s = (ScriptObjectMirror) engine.get("praiseBang");
         if (s == null) {

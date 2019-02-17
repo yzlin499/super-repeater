@@ -13,6 +13,7 @@ import top.yzlin.superrepeater.jsparse.JSParse;
 
 import javax.script.ScriptException;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -48,14 +49,11 @@ public class MainConfig {
                 .map(f -> {
                     try {
                         return jsParse.parse(f);
-                    } catch (FileNotFoundException | ScriptException e) {
+                    } catch (FileNotFoundException | ScriptException | UnsupportedEncodingException e) {
                         e.printStackTrace();
                         return null;
                     }
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toMap(MethodEvent::getName, v -> v));
     }
-
-
-
 }
