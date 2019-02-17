@@ -1,9 +1,8 @@
 var praiseBang = {
-    check: function () {
+    check: function (msg) {
         return true;
     },
-    operate: function () {
-        praiseBang.test("asd");
-        return 123;
+    operate: function (msg) {
+        return msg.message;
     }
 };

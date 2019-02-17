@@ -2,7 +2,7 @@ cqRobot:
   port: 6700
 
 user:
-  groupID: 177203593
-  jspath: d:/qqq
-  logpath: d:/qqq/log
+  groupID: 730074397
+  jspath: c:/repeater/js
+  logpath: c:/repeater/log
   privateKey: praiseBang

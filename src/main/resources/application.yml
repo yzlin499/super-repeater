@@ -7,7 +7,7 @@ spring:
     include: user
   servlet:
     multipart:
-      max-file-size: 10KB
+      max-file-size: 5KB
   http:
     encoding:
       charset: UTF-8
@@ -17,3 +17,4 @@ spring:
 server:
   tomcat:
     uri-encoding: UTF-8
+  port: 80

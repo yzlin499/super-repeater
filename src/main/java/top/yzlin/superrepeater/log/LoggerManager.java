@@ -26,6 +26,14 @@ public class LoggerManager {
         }
     }
 
+    public File getLogFile(String name) {
+        File file = new File(logPath, name + ".log");
+        if (!file.exists()) {
+            return null;
+        }
+        return file;
+    }
+
     public LogOperate getLogOperate(String name) {
         LogOperate temp;
         if (!logOperateMap.containsKey(name)) {
@@ -38,7 +46,7 @@ public class LoggerManager {
     }
 
     private LogOperate createLogOperateFormFile(String name) {
-        return new LogOperate(new File(logPath, name));
+        return new LogOperate(new File(logPath, name + ".log"));
     }
 
 }

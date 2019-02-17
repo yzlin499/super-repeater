@@ -27,6 +27,7 @@ public class JSParse {
     private SimpleHttpAPI simpleHttpAPI;
     private String groupID;
     private LoggerManager loggerManager;
+    private JSTools jsTools;
 
     @Autowired
     public void setLoggerManager(LoggerManager loggerManager) {
@@ -36,6 +37,11 @@ public class JSParse {
     @Autowired
     public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
         this.simpleHttpAPI = simpleHttpAPI;
+    }
+
+    @Autowired
+    public void setJsTools(JSTools jsTools) {
+        this.jsTools = jsTools;
     }
 
     @Value("${user.groupID}")
@@ -100,7 +106,7 @@ public class JSParse {
                 jsMethodEvent.setOperateFunction(j -> {
                     Object result = mirror.call(null, j);
                     if (result instanceof Integer || result instanceof String) {
-                        simpleHttpAPI.sendGroupMsg(groupID, operate.toString());
+                        simpleHttpAPI.sendGroupMsg(groupID, result.toString());
                     }
                 });
             } else {
@@ -117,5 +123,6 @@ public class JSParse {
         s.put("robot", simpleHttpAPI);
         s.put("groupID", groupID);
         s.put("log", (Consumer) logOperate::log);
+        s.put("tools", jsTools);
     }
 }
