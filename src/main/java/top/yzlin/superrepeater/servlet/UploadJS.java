@@ -78,11 +78,13 @@ public class UploadJS {
             MethodEvent methodEvent = jsParse.parse(dest);
             if (methodEvent == null) {
                 dest.delete();
+                methodManager.removeEvent(fileName);
                 return "上传成功了\n" +
                         "文件识别名为" + fileName + "\n" +
-                        "但是，到最后居然运行失败了，请联系管理";
+                        "但是，到最后居然运行失败了，请联系管理\n" +
+                        "因为失败的原因，原来有效的文件被删除而且事件也删除了";
             }
-            methodManager.addEvent(methodEvent);
+            methodManager.addEvent(fileName, methodEvent);
             return "也许成功了\n" +
                     "文件识别名为" + fileName;
         } catch (IllegalStateException | IOException e) {

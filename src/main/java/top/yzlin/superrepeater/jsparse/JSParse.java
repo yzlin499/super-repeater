@@ -1,11 +1,14 @@
 package top.yzlin.superrepeater.jsparse;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.SimpleHttpAPI;
+import top.yzlin.superrepeater.log.LogOperate;
+import top.yzlin.superrepeater.log.LoggerManager;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -15,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,6 +26,12 @@ public class JSParse {
     private ScriptEngineManager manager = new ScriptEngineManager();
     private SimpleHttpAPI simpleHttpAPI;
     private String groupID;
+    private LoggerManager loggerManager;
+
+    @Autowired
+    public void setLoggerManager(LoggerManager loggerManager) {
+        this.loggerManager = loggerManager;
+    }
 
     @Autowired
     public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
@@ -36,6 +46,7 @@ public class JSParse {
     public MethodEvent parse(File file) throws FileNotFoundException, ScriptException {
         //实例化一个操作方法
         JSMethodEvent jsMethodEvent = new JSMethodEvent();
+        jsMethodEvent.setName(file.getName());
         ScriptEngine engine = manager.getEngineByName("javascript");
         FileReader reader = new FileReader(file);
 
@@ -46,7 +57,7 @@ public class JSParse {
             return null;
         }
         //注入机器人的操作函数
-        injectionProperties(s);
+        injectionProperties(s, file.getName());
 
         //获取检查节点
         Object check = s.get("check");
@@ -66,7 +77,13 @@ public class JSParse {
                     return Boolean.TRUE.equals(result) || result instanceof Integer && (!Integer.valueOf(0).equals(result));
                 });
             } else {
-                return null;
+                //判断是否可变为正则表达式
+                try {
+                    NativeRegExp nativeRegExp = mirror.to(NativeRegExp.class);
+                    jsMethodEvent.setCheckFunction(j -> nativeRegExp.test(j.getString("message")));
+                } catch (ClassCastException e) {
+                    return null;
+                }
             }
         } else {
             return null;
@@ -95,8 +112,10 @@ public class JSParse {
         return jsMethodEvent;
     }
 
-    private void injectionProperties(ScriptObjectMirror s) {
+    private void injectionProperties(ScriptObjectMirror s, String fileName) {
+        LogOperate logOperate = loggerManager.getLogOperate(fileName);
         s.put("robot", simpleHttpAPI);
         s.put("groupID", groupID);
+        s.put("log", (Consumer) logOperate::log);
     }
 }

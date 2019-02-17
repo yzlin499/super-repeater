@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class JSMethodEvent implements MethodEvent {
+    private String name;
     private Predicate<JSONObject> checkFunction;
     private Consumer<JSONObject> operateFunction;
 
@@ -16,6 +17,15 @@ public class JSMethodEvent implements MethodEvent {
 
     public void setOperateFunction(Consumer<JSONObject> operateFunction) {
         this.operateFunction = operateFunction;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

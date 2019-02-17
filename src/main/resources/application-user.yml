@@ -4,4 +4,5 @@ cqRobot:
 user:
   groupID: 177203593
   jspath: d:/qqq
+  logpath: d:/qqq/log
   privateKey: praiseBang

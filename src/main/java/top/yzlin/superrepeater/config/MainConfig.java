@@ -13,7 +13,7 @@ import top.yzlin.superrepeater.jsparse.JSParse;
 
 import javax.script.ScriptException;
 import java.io.FileNotFoundException;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,7 +43,7 @@ public class MainConfig {
     }
 
     @Bean
-    public List<MethodEvent> methodEventList() {
+    public Map<String, MethodEvent> methodEventMap() {
         return Stream.of(jsFile.getFiles())
                 .map(f -> {
                     try {
@@ -53,7 +53,7 @@ public class MainConfig {
                         return null;
                     }
                 }).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(MethodEvent::getName, v -> v));
     }
 
 

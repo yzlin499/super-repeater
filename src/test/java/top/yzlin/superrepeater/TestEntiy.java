@@ -9,4 +9,12 @@ public class TestEntiy {
     public void si(String a) {
         System.out.println(a + System.currentTimeMillis());
     }
+
+    public void ooo(String a) {
+        System.out.println(a);
+    }
+
+//    public void ooo(){
+//        System.out.println(123);
+//    }
 }

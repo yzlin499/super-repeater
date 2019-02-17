@@ -6,15 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import top.yzlin.superrepeater.aop.MethodEventAop;
 import top.yzlin.tools.Tools;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Component
 public class MethodManager implements Consumer<JSONObject>, DisposableBean {
-    private List<MethodEvent> eventList = new ArrayList<>();
+    private Map<String, MethodEvent> eventMap = new HashMap<>();
     private long groupID;
 
     @Value("${user.groupID}")
@@ -25,9 +26,10 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     @Override
     public void accept(JSONObject jsonObject) {
         if (jsonObject.getLongValue("group_id") == groupID) {
-            eventList.forEach(e -> {
-                if (e.check(jsonObject)) {
-                    e.operate(jsonObject);
+            eventMap.forEach((k, v) -> {
+                if (v.check(jsonObject)) {
+                    v.operate(jsonObject);
+                    //防止被腾讯封号
                     Tools.sleep(500);
                 }
             });
@@ -36,22 +38,22 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     }
 
     @Autowired
-    @Qualifier("methodEventList")
-    public boolean addAllEvent(List<MethodEvent> methodEvents) {
-        return eventList.addAll(methodEvents);
+    @Qualifier("methodEventMap")
+    public void addAllEvent(Map<String, MethodEvent> methodEvents) {
+        methodEvents.forEach(this::addEvent);
     }
 
-    public boolean addEvent(MethodEvent methodEvent) {
-        return eventList.add(methodEvent);
+    public MethodEvent addEvent(String name, MethodEvent methodEvent) {
+        return eventMap.put(name, new MethodEventAop(methodEvent));
     }
 
-    public boolean removeEvent(MethodEvent methodEvent) {
-        return eventList.remove(methodEvent);
+    public MethodEvent removeEvent(String name) {
+        return eventMap.remove(name);
     }
 
     @Override
     public void destroy() throws Exception {
-        eventList.clear();
-        eventList = null;
+        eventMap.clear();
+        eventMap = null;
     }
 }
