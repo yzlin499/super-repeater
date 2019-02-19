@@ -10,6 +10,7 @@ import top.yzlin.superrepeater.MethodManager;
 import top.yzlin.superrepeater.SimpleHttpAPI;
 import top.yzlin.superrepeater.jsparse.JSFile;
 import top.yzlin.superrepeater.jsparse.JSParse;
+import top.yzlin.superrepeater.log.LoggerManager;
 
 import javax.script.ScriptException;
 import java.io.FileNotFoundException;
@@ -21,17 +22,12 @@ import java.util.stream.Stream;
 
 @Configuration
 public class MainConfig {
-    private JSFile jsFile;
-    private JSParse jsParse;
 
-    @Autowired
-    public void setJsParse(JSParse jsParse) {
-        this.jsParse = jsParse;
-    }
-
-    @Autowired
-    public void setJsFile(JSFile jsFile) {
-        this.jsFile = jsFile;
+    @Bean
+    public LoggerManager loggerManager(@Value("${user.logpath}") String logpath) {
+        LoggerManager l = new LoggerManager();
+        l.setLogPath(logpath);
+        return l;
     }
 
     @Bean
@@ -44,7 +40,9 @@ public class MainConfig {
     }
 
     @Bean
-    public Map<String, MethodEvent> methodEventMap() {
+    @Scope("singleton")
+    public Map<String, MethodEvent> methodEventMap(@Autowired JSParse jsParse,
+                                                   @Autowired JSFile jsFile) {
         return Stream.of(jsFile.getFiles())
                 .map(f -> {
                     try {

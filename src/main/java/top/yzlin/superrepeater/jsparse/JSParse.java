@@ -70,7 +70,7 @@ public class JSParse {
 
         //为方法设置检查方法
         //如果值为数字或者字符串则进行值对比，如果为数组则判断数组的值，如果为函数着将函数的返回结果作为判断
-        if (check instanceof Integer || check instanceof String) {
+        if (check instanceof Number || check instanceof String) {
             jsMethodEvent.setCheckFunction(j -> Objects.equals(check, j.getString("message")));
         } else if (check instanceof ScriptObjectMirror) {
             ScriptObjectMirror mirror = (ScriptObjectMirror) check;
@@ -80,7 +80,7 @@ public class JSParse {
             } else if (mirror.isFunction()) {
                 jsMethodEvent.setCheckFunction(j -> {
                     Object result = mirror.call(null, j);
-                    return Boolean.TRUE.equals(result) || result instanceof Integer && (!Integer.valueOf(0).equals(result));
+                    return Boolean.TRUE.equals(result) || result instanceof Number && (!Integer.valueOf(0).equals(result));
                 });
             } else {
                 //判断是否可变为正则表达式
@@ -98,14 +98,14 @@ public class JSParse {
         //操作
         Object operate = s.get("operate");
         //如果操作的值为数字或者字符串则返回该值
-        if (operate instanceof Integer || operate instanceof String) {
+        if (operate instanceof Number || operate instanceof String) {
             jsMethodEvent.setOperateFunction(j -> simpleHttpAPI.sendGroupMsg(groupID, operate.toString()));
         } else if (operate instanceof ScriptObjectMirror) {
             ScriptObjectMirror mirror = (ScriptObjectMirror) operate;
             if (mirror.isFunction()) {
                 jsMethodEvent.setOperateFunction(j -> {
                     Object result = mirror.call(null, j);
-                    if (result instanceof Integer || result instanceof String) {
+                    if (result instanceof Number || result instanceof String) {
                         simpleHttpAPI.sendGroupMsg(groupID, result.toString());
                     }
                 });

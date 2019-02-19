@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.yzlin.superrepeater.aop.MethodEventAop;
+import top.yzlin.superrepeater.log.LoggerManager;
 import top.yzlin.tools.Tools;
 
 import java.util.HashMap;
@@ -15,12 +16,18 @@ import java.util.function.Consumer;
 
 @Component
 public class MethodManager implements Consumer<JSONObject>, DisposableBean {
+    private LoggerManager loggerManager;
     private Map<String, MethodEvent> eventMap = new HashMap<>();
     private long groupID;
 
     @Value("${user.groupID}")
     public void setGroupID(long groupID) {
         this.groupID = groupID;
+    }
+
+    @Autowired
+    public void setLoggerManager(LoggerManager loggerManager) {
+        this.loggerManager = loggerManager;
     }
 
     @Override
@@ -44,7 +51,9 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     }
 
     public MethodEvent addEvent(String name, MethodEvent methodEvent) {
-        return eventMap.put(name, new MethodEventAop(methodEvent));
+        MethodEventAop m = new MethodEventAop(methodEvent);
+        m.setLoggerManager(loggerManager);
+        return eventMap.put(name, m);
     }
 
     public MethodEvent removeEvent(String name) {

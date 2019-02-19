@@ -1,4 +1,6 @@
 var praiseBang = {
-    check: "praiseBang",
-    operate: "praiseBang！！！"
+    check: "hello bang",
+    operate: function () {
+        praiseBang.log("hello bang!!!");
+    }
 };

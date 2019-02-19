@@ -1,8 +1,6 @@
 package top.yzlin.superrepeater.log;
 
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -10,12 +8,12 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+
 public class LoggerManager implements DisposableBean {
     private File logPath;
     private Map<String, LogOperate> logOperateMap = new HashMap<>();
 
-    @Value("${user.logpath}")
+
     public void setLogPath(String path) {
         try {
             logPath = ResourceUtils.getFile(path);

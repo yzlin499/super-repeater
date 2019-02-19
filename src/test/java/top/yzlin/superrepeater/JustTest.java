@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import javax.script.ScriptException;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class JustTest {
 
@@ -25,5 +27,14 @@ public class JustTest {
 //        //获取检查节点
 //        ScriptObjectMirror aaa = (ScriptObjectMirror) s.get("operate");
 //        aaa.call(null);
+        try {
+            String a = null;
+            a.toString();
+        } catch (Exception e) {
+            StringWriter stringWriter = new StringWriter();
+            e.printStackTrace(new PrintWriter(stringWriter));
+            String aaaa = stringWriter.toString();
+//            System.out.println(aaaa);
+        }
     }
 }
