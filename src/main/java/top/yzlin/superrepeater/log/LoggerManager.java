@@ -12,6 +12,7 @@ import java.util.Map;
 public class LoggerManager implements DisposableBean {
     private File logPath;
     private Map<String, LogOperate> logOperateMap = new HashMap<>();
+    private Map<String, File> fileMap = new HashMap<>();
 
 
     public void setLogPath(String path) {
@@ -26,11 +27,18 @@ public class LoggerManager implements DisposableBean {
     }
 
     public File getLogFile(String name) {
-        File file = new File(logPath, name + ".log");
-        if (!file.exists()) {
-            return null;
+        if (fileMap.containsKey(name)) {
+            return fileMap.get(name);
+        } else {
+            File file = new File(logPath, name + ".log");
+            if (file.exists()) {
+                fileMap.put(name, file);
+                return file;
+            } else {
+                return null;
+            }
         }
-        return file;
+
     }
 
     public LogOperate getLogOperate(String name) {
@@ -49,7 +57,7 @@ public class LoggerManager implements DisposableBean {
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         logOperateMap.forEach((k, v) -> v.close());
         logOperateMap.clear();
         logOperateMap = null;

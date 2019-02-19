@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="这个是+${name}+的日志">这个是日志</title>
+    <style>
+        ul {
+            padding: 0;
+        }
+
+        li {
+            list-style-type: none;
+            font-size: 1.2em;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<h2>关于调整这个日志，请在地址栏输入参数吧：line=一次出现几行</h2>
+<ul th:each="item : ${logList}">
+    <li th:text="${item}">[10.10.10] 456465465</li>
+</ul>
+</body>
+</html>
