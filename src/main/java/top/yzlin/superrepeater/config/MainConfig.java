@@ -10,9 +10,7 @@ import top.yzlin.superrepeater.MethodManager;
 import top.yzlin.superrepeater.SimpleHttpAPI;
 import top.yzlin.superrepeater.jsparse.JSFile;
 import top.yzlin.superrepeater.jsparse.JSParse;
-import top.yzlin.superrepeater.log.LoggerManager;
 
-import javax.script.ScriptException;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -22,13 +20,6 @@ import java.util.stream.Stream;
 
 @Configuration
 public class MainConfig {
-
-    @Bean
-    public LoggerManager loggerManager(@Value("${user.logpath}") String logpath) {
-        LoggerManager l = new LoggerManager();
-        l.setLogPath(logpath);
-        return l;
-    }
 
     @Bean
     @Scope("singleton")
@@ -47,7 +38,7 @@ public class MainConfig {
                 .map(f -> {
                     try {
                         return jsParse.parse(f);
-                    } catch (FileNotFoundException | ScriptException | UnsupportedEncodingException e) {
+                    } catch (FileNotFoundException | UnsupportedEncodingException e) {
                         e.printStackTrace();
                         return null;
                     }

@@ -3,6 +3,7 @@ package top.yzlin.superrepeater.jsparse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import top.yzlin.superrepeater.Tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,15 +17,7 @@ public class JSFile {
         try {
             File path = ResourceUtils.getFile(jspath);
             if (path.exists()) {
-                files = path.listFiles(pathname -> {
-                    if (pathname.isFile()) {
-                        String fileName = pathname.getName();
-                        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
-                        return "JS".equals(suffix);
-                    } else {
-                        return false;
-                    }
-                });
+                files = path.listFiles(Tools.filterBySuffix("js"));
             } else {
                 path.mkdirs();
                 files = new File[0];

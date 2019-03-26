@@ -18,8 +18,10 @@
 </head>
 <body>
 <h2>关于调整这个日志，请在地址栏输入参数吧：line=一次出现几行</h2>
+<a th:href="@{'/log/src/'+${name}}">如果要看原来的日志，点击这里</a>
+
 <ul th:each="item : ${logList}">
-    <li th:text="${item}">[10.10.10] 456465465</li>
+    <li th:text="${item}"></li>
 </ul>
 </body>
 </html>

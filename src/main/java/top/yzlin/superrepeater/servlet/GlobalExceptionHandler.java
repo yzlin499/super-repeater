@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MultipartException.class)
     @ResponseBody
     public String handleError(MultipartException e, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("message", e.getCause().getMessage());
+//        redirectAttributes.addFlashAttribute("message", e.getCause().getMessage());
         return "文件大小炸了哇";
     }
 }

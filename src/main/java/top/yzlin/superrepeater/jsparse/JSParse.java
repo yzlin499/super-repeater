@@ -5,6 +5,7 @@ import jdk.nashorn.internal.objects.NativeRegExp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import top.yzlin.superrepeater.LanguageParse;
 import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.SimpleHttpAPI;
 import top.yzlin.superrepeater.log.LogOperate;
@@ -12,7 +13,6 @@ import top.yzlin.superrepeater.log.LoggerManager;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.*;
 import java.util.Objects;
 import java.util.Set;
@@ -20,13 +20,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Component
-public class JSParse {
+public class JSParse implements LanguageParse {
     private ScriptEngineManager manager = new ScriptEngineManager();
     private SimpleHttpAPI simpleHttpAPI;
     private String groupID;
     private LoggerManager loggerManager;
     private JSTools jsTools;
 
+    @Override
     @Autowired
     public void setLoggerManager(LoggerManager loggerManager) {
         this.loggerManager = loggerManager;
@@ -42,12 +43,14 @@ public class JSParse {
         this.jsTools = jsTools;
     }
 
+    @Override
     @Value("${user.groupID}")
     public void setGroupID(String groupID) {
         this.groupID = groupID;
     }
 
-    public MethodEvent parse(File file) throws FileNotFoundException, ScriptException, UnsupportedEncodingException {
+    @Override
+    public MethodEvent parse(File file) throws FileNotFoundException, UnsupportedEncodingException {
         //实例化一个操作方法
         JSMethodEvent jsMethodEvent = new JSMethodEvent();
         jsMethodEvent.setName(file.getName());
@@ -55,8 +58,15 @@ public class JSParse {
 
         FileInputStream fis = new FileInputStream(file);
         InputStreamReader isr = new InputStreamReader(fis, "utf-8");
-
-        engine.eval(isr);
+        try {
+            engine.eval(isr);
+        } catch (Exception e) {
+            LogOperate logOperate = loggerManager.getLogOperate(file.getName());
+            StringWriter stringWriter = new StringWriter();
+            e.printStackTrace(new PrintWriter(stringWriter));
+            logOperate.log(stringWriter);
+            return null;
+        }
         //获取最外层的赞美棒哥节点
         ScriptObjectMirror s = (ScriptObjectMirror) engine.get("praiseBang");
         if (s == null) {

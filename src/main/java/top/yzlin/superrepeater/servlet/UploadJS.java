@@ -12,7 +12,6 @@ import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.MethodManager;
 import top.yzlin.superrepeater.jsparse.JSParse;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 
@@ -90,10 +89,6 @@ public class UploadJS {
         } catch (IllegalStateException | IOException e) {
             e.printStackTrace();
             return "false";
-        } catch (ScriptException e) {
-            return "上传成功了\n" +
-                    "文件识别名为" + fileName + "\n" +
-                    "但是，到最后居然运行失败了，请联系管理";
         }
     }
 }

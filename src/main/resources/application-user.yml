@@ -6,3 +6,5 @@ user:
   jspath: c:/repeater/js
   logpath: c:/repeater/log
   privateKey: praiseBang
+  javapath: D:/Temp
+  classpath: d:/Temp/class
