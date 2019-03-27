@@ -13,11 +13,11 @@ import java.io.File;
 public class JavaParse implements LanguageParse {
     private String groupID;
     private LoggerManager loggerManager;
-    private LocalClassLoader classLoader;
+    private ClassLoaderFactory loaderFactory;
 
     @Autowired
-    public void setClassLoader(LocalClassLoader classLoader) {
-        this.classLoader = classLoader;
+    public void setClassLoader(ClassLoaderFactory loaderFactory) {
+        this.loaderFactory = loaderFactory;
     }
 
     @Value("${user.groupID}")
@@ -35,9 +35,8 @@ public class JavaParse implements LanguageParse {
     @Override
     public MethodEvent parse(File file) throws Exception {
         String name = file.getName();
-//        if(name.substring(0,name.lastIndexOf('0')))
-
-        return null;
+        name = name.substring(0, name.lastIndexOf('.'));
+        return new JavaMethodEvent(loaderFactory.compiler(name), groupID, loggerManager.getLogOperate(file.getName()));
     }
 
 }

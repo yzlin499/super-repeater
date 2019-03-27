@@ -7,4 +7,4 @@ user:
   logpath: c:/repeater/log
   privateKey: praiseBang
   javapath: D:/Temp
-  classpath: d:/Temp/class
+  classpath: D:/Temp/class
