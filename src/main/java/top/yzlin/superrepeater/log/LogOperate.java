@@ -1,9 +1,6 @@
 package top.yzlin.superrepeater.log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,6 +11,12 @@ public class LogOperate {
 
     public LogOperate(File file) {
         this.file = file;
+    }
+
+    public void log(Exception e) {
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        log(stringWriter);
     }
 
     public void log(Object text) {

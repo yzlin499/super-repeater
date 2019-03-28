@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.yzlin.superrepeater.LanguageParse;
 import top.yzlin.superrepeater.MethodEvent;
+import top.yzlin.superrepeater.SimpleHttpAPI;
 import top.yzlin.superrepeater.log.LoggerManager;
 
 import java.io.File;
@@ -14,6 +15,12 @@ public class JavaParse implements LanguageParse {
     private String groupID;
     private LoggerManager loggerManager;
     private ClassLoaderFactory loaderFactory;
+    private SimpleHttpAPI simpleHttpAPI;
+
+    @Autowired
+    public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
+        this.simpleHttpAPI = simpleHttpAPI;
+    }
 
     @Autowired
     public void setClassLoader(ClassLoaderFactory loaderFactory) {
@@ -36,7 +43,7 @@ public class JavaParse implements LanguageParse {
     public MethodEvent parse(File file) throws Exception {
         String name = file.getName();
         name = name.substring(0, name.lastIndexOf('.'));
-        return new JavaMethodEvent(loaderFactory.compiler(name), groupID, loggerManager.getLogOperate(file.getName()));
+        return new JavaMethodEvent(loaderFactory.compiler(name), groupID, loggerManager.getLogOperate(file.getName()), simpleHttpAPI);
     }
 
 }

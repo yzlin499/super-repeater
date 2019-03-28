@@ -5,9 +5,6 @@ import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.log.LogOperate;
 import top.yzlin.superrepeater.log.LoggerManager;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  * 切面，用于日志与异常处理
  */
@@ -34,9 +31,7 @@ public class MethodEventAop implements MethodEvent {
         try {
             return methodEvent.check(data);
         } catch (Exception e) {
-            StringWriter stringWriter = new StringWriter();
-            e.printStackTrace(new PrintWriter(stringWriter));
-            logOperate.log(stringWriter);
+            logOperate.log(e);
             return false;
         }
     }
@@ -46,9 +41,7 @@ public class MethodEventAop implements MethodEvent {
         try {
             methodEvent.operate(data);
         } catch (Exception e) {
-            StringWriter stringWriter = new StringWriter();
-            e.printStackTrace(new PrintWriter(stringWriter));
-            logOperate.log(stringWriter);
+            logOperate.log(e);
         }
     }
 }
