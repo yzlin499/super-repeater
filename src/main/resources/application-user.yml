@@ -3,8 +3,8 @@ cqRobot:
 
 user:
   groupID: 730074397
-  jspath: c:/repeater/js
-  logpath: c:/repeater/log
+  jspath: C:/repeater/js
+  logpath: C:/repeater/log
   privateKey: praiseBang
-  javapath: D:/Temp
-  classpath: D:/Temp/class
+  javapath: C:/repeater/java
+  classpath: C:/repeater/class

@@ -8,11 +8,14 @@ import org.springframework.context.annotation.Scope;
 import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.MethodManager;
 import top.yzlin.superrepeater.SimpleHttpAPI;
+import top.yzlin.superrepeater.javaparse.JavaClass;
+import top.yzlin.superrepeater.javaparse.JavaParse;
 import top.yzlin.superrepeater.jsparse.JSFile;
 import top.yzlin.superrepeater.jsparse.JSParse;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,8 +36,11 @@ public class MainConfig {
     @Bean
     @Scope("singleton")
     public Map<String, MethodEvent> methodEventMap(@Autowired JSParse jsParse,
-                                                   @Autowired JSFile jsFile) {
-        return Stream.of(jsFile.getFiles())
+                                                   @Autowired JSFile jsFile,
+                                                   @Autowired JavaParse javaParse,
+                                                   @Autowired JavaClass javaClass) {
+        Map<String, MethodEvent> eventMap = new HashMap<>();
+        eventMap.putAll(Stream.of(jsFile.getFiles())
                 .map(f -> {
                     try {
                         return jsParse.parse(f);
@@ -43,6 +49,17 @@ public class MainConfig {
                         return null;
                     }
                 }).filter(Objects::nonNull)
-                .collect(Collectors.toMap(MethodEvent::getName, v -> v));
+                .collect(Collectors.toMap(MethodEvent::getName, v -> v)));
+        eventMap.putAll(Stream.of(javaClass.getFiles())
+                .map(f -> {
+                    try {
+                        return javaParse.parse(f);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .collect(Collectors.toMap(MethodEvent::getName, v -> v)));
+        return eventMap;
     }
 }

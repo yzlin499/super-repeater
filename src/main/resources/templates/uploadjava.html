@@ -20,17 +20,14 @@
     </style>
 </head>
 <body>
-<form action="/jsFileUpload" enctype="multipart/form-data" method="post">
+<form action="/javaFileUpload" enctype="multipart/form-data" method="post">
     <fieldset>
         <legend>开始赞美棒哥</legend>
         <div>
-            <label>文件名：<input type="text" title="文件名" name="onlyName"></label>
+            <label>密钥：<input name="privateKey" title="密钥" type="password"></label>
         </div>
         <div>
-            <label>密钥：<input type="password" title="密钥" name="privateKey"></label>
-        </div>
-        <div>
-            <p>选择文件: <input type="file" name="fileName" accept=".js"/></p>
+            <p>选择文件: <input accept=".java" name="fileName" type="file"/></p>
         </div>
         <div>
             <input type="submit" value="提交">

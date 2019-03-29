@@ -2,6 +2,7 @@ package top.yzlin.superrepeater;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Component
-public class MethodManager implements Consumer<JSONObject>, DisposableBean {
+public class MethodManager implements Consumer<JSONObject>, DisposableBean, InitializingBean {
     private LoggerManager loggerManager;
     private Map<String, MethodEvent> eventMap = new HashMap<>();
     private long groupID;
+
 
     @Value("${user.groupID}")
     public void setGroupID(long groupID) {
@@ -46,8 +48,20 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
 
     @Autowired
     @Qualifier("methodEventMap")
+    public void setEventMap(Map<String, MethodEvent> eventMap) {
+        this.eventMap = eventMap;
+    }
+
+
     public void addAllEvent(Map<String, MethodEvent> methodEvents) {
         methodEvents.forEach(this::addEvent);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Map<String, MethodEvent> m = eventMap;
+        eventMap = new HashMap<>(m.size());
+        addAllEvent(m);
     }
 
     public MethodEvent addEvent(String name, MethodEvent methodEvent) {

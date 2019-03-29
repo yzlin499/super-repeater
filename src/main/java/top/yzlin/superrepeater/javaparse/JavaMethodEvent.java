@@ -7,11 +7,14 @@ import top.yzlin.superrepeater.log.LogOperate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JavaMethodEvent extends BaseMethodEvent {
     private String groupID;
@@ -35,28 +38,24 @@ public class JavaMethodEvent extends BaseMethodEvent {
         setProperty("setSendGroupMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendGroupMsg(g.toString(), m.toString()));
         setProperty("setSendDiscussMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendDiscussMsg(g.toString(), m.toString()));
         setProperty("setSendPersonMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendPersonMsg(g.toString(), m.toString()));
-        init(clazz);
+        init();
     }
 
-    private void init(Class clazz) throws InstantiationException {
-        try {
-            setCheckFunction(makeCheck(clazz.getMethod("check"), false));
-        } catch (NoSuchMethodException e) {
-            try {
-                setCheckFunction(makeCheck(clazz.getMethod("check", Map.class), true));
-            } catch (NoSuchMethodException e1) {
-                throw new InstantiationException("check函数不存在，无法使用");
-            }
+    private void init() throws InstantiationException {
+        Map<String, Method> methodMap = Stream.of(clazz.getMethods())
+                .collect(Collectors.toMap(Method::getName, v -> v, (o1, o2) -> o1));
+
+        Method check = methodMap.get("check");
+        if (check == null) {
+            throw new InstantiationException("check函数不存在，无法使用");
         }
-        try {
-            setOperateFunction(makeOperate(clazz.getMethod("operate"), false));
-        } catch (NoSuchMethodException e) {
-            try {
-                setOperateFunction(makeOperate(clazz.getMethod("operate", Map.class), true));
-            } catch (NoSuchMethodException e1) {
-                throw new InstantiationException("operate函数不存在，无法使用");
-            }
+        setCheckFunction(makeCheck(check));
+
+        Method operate = methodMap.get("operate");
+        if (operate == null) {
+            throw new InstantiationException("operate函数不存在，无法使用");
         }
+        setOperateFunction(makeOperate(operate));
     }
 
     private <T> void setProperty(String name, Class<T> paramClass, T o) throws InvocationTargetException, IllegalAccessException {
@@ -66,12 +65,13 @@ public class JavaMethodEvent extends BaseMethodEvent {
         }
     }
 
-    private Predicate<JSONObject> makeCheck(Method check, boolean isArg) throws InstantiationException {
+    private Predicate<JSONObject> makeCheck(Method check) throws InstantiationException {
         Class returnType = check.getReturnType();
+        Function<JSONObject, Object[]> paramFunc = jsonToParam(getMethodParam(check));
         if (String.class.equals(returnType)) {
             return m -> {
                 try {
-                    return m.getString("message").equals(check.invoke(instance, isArg ? m : new Object[0]));
+                    return m.getString("message").equals(check.invoke(instance, paramFunc.apply(m)));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     logOperate.log(e);
                     return false;
@@ -80,7 +80,7 @@ public class JavaMethodEvent extends BaseMethodEvent {
         } else if (boolean.class.equals(returnType) || Boolean.class.equals(returnType)) {
             return m -> {
                 try {
-                    return (boolean) check.invoke(instance, isArg ? m : new Object[0]);
+                    return (boolean) check.invoke(instance, paramFunc.apply(m));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     logOperate.log(e);
                     return false;
@@ -91,12 +91,13 @@ public class JavaMethodEvent extends BaseMethodEvent {
         }
     }
 
-    private Consumer<JSONObject> makeOperate(Method check, boolean isArg) throws InstantiationException {
+    private Consumer<JSONObject> makeOperate(Method check) throws InstantiationException {
         Class returnType = check.getReturnType();
+        Function<JSONObject, Object[]> paramFunc = jsonToParam(getMethodParam(check));
         if (void.class.equals(returnType)) {
             return m -> {
                 try {
-                    check.invoke(instance, isArg ? m : new Object[0]);
+                    check.invoke(instance, paramFunc.apply(m));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     logOperate.log(e);
                 }
@@ -104,7 +105,10 @@ public class JavaMethodEvent extends BaseMethodEvent {
         } else {
             return m -> {
                 try {
-                    sendGroupMsg(groupID, Objects.toString(check.invoke(instance, isArg ? m : new Object[0]).toString()));
+                    Object r = check.invoke(instance, paramFunc.apply(m));
+                    if (r != null) {
+                        simpleHttpAPI.sendGroupMsg(groupID, r.toString());
+                    }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     logOperate.log(e);
                 }
@@ -112,7 +116,39 @@ public class JavaMethodEvent extends BaseMethodEvent {
         }
     }
 
-    private void sendGroupMsg(String groupID, String msg) {
-        simpleHttpAPI.sendGroupMsg(groupID, msg);
+
+    private Class[] getMethodParam(Method m) {
+        return Stream.of(m.getParameters())
+                .map(Parameter::getType)
+                .toArray(Class[]::new);
+    }
+
+    private Function<JSONObject, Object[]> jsonToParam(Class[] p) {
+        switch (p.length) {
+            case 0:
+                return j -> new Object[0];
+            case 1:
+                if (p[0].equals(String.class)) {
+                    return j -> new Object[]{j.getString("message")};
+                } else if (p[0].equals(Map.class)) {
+                    return j -> new Object[]{j};
+                }
+                break;
+            case 2:
+                if (p[0].equals(String.class) && p[1].equals(String.class)) {
+                    return j -> new Object[]{j.getString("user_id"), j.getString("message")};
+                } else if ((p[0].equals(int.class) || p[0].equals(Integer.class)) && p[1].equals(String.class)) {
+                    return j -> new Object[]{j.getInteger("user_id"), j.getString("message")};
+                } else if ((p[0].equals(long.class) || p[0].equals(Long.class)) && p[1].equals(String.class)) {
+                    return j -> new Object[]{j.getLong("user_id"), j.getString("message")};
+                }
+                break;
+            default:
+        }
+        Object[] nullArray = new Object[p.length];
+        for (int i = 0; i < p.length; i++) {
+            nullArray[i] = null;
+        }
+        return jsonObject -> nullArray;
     }
 }

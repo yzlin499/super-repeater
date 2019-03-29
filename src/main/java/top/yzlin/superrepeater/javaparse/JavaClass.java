@@ -1,26 +1,34 @@
 package top.yzlin.superrepeater.javaparse;
 
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
+import top.yzlin.superrepeater.Tools;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 @Component
-public class JavaClass implements InitializingBean {
-    private Class[] clazz;
-    private File file;
+public class JavaClass {
+    private File[] files;
 
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-//        Stream.of(file.listFiles(Tools.filterBySuffix("class")))
-//                .map(f->{
-//                    String name=f.getName()
-//                })
+    @Value("${user.javapath}")
+    public void setJspath(String jspath) {
+        try {
+            File path = ResourceUtils.getFile(jspath);
+            if (path.exists()) {
+                files = path.listFiles(Tools.filterBySuffix("java"));
+            } else {
+                path.mkdirs();
+                files = new File[0];
+            }
+        } catch (FileNotFoundException e) {
+            files = new File[0];
+            e.printStackTrace();
+        }
     }
 
-
-    public Class[] getClazz() {
-        return clazz;
+    public File[] getFiles() {
+        return files;
     }
 }

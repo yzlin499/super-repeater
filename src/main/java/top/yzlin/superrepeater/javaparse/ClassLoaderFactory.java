@@ -7,6 +7,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 
 @Component
 public class ClassLoaderFactory {
@@ -34,18 +35,18 @@ public class ClassLoaderFactory {
         this.javapath = pathCreate(javapath);
     }
 
-    public Class compiler(String name) throws ClassNotFoundException {
+    public Class compiler(String name) throws ClassNotFoundException, IOException {
         return compiler(new File(javapath, name + ".java"));
     }
 
-    public Class compiler(File file) throws ClassNotFoundException {
+    public Class compiler(File file) throws ClassNotFoundException, IOException {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
         javac.run(null, null, err,
                 "-encoding", "UTF-8",
                 "-classpath", file.getAbsolutePath(),
                 "-d", classpath, file.getAbsolutePath());
         if (err.size() > 0) {
-            throw new RuntimeException(err.toString());
+            throw new IOException(err.toString());
         } else {
             String name = file.getName();
             name = name.substring(0, name.lastIndexOf('.'));

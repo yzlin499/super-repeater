@@ -9,6 +9,8 @@ import top.yzlin.superrepeater.SimpleHttpAPI;
 import top.yzlin.superrepeater.log.LoggerManager;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 @Component
 public class JavaParse implements LanguageParse {
@@ -40,10 +42,15 @@ public class JavaParse implements LanguageParse {
     }
 
     @Override
-    public MethodEvent parse(File file) throws Exception {
+    public MethodEvent parse(File file) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
         String name = file.getName();
         name = name.substring(0, name.lastIndexOf('.'));
-        return new JavaMethodEvent(loaderFactory.compiler(name), groupID, loggerManager.getLogOperate(file.getName()), simpleHttpAPI);
+        JavaMethodEvent m = new JavaMethodEvent(loaderFactory.compiler(name),
+                groupID,
+                loggerManager.getLogOperate(file.getName()),
+                simpleHttpAPI);
+        m.setName(file.getName());
+        return m;
     }
 
 }
