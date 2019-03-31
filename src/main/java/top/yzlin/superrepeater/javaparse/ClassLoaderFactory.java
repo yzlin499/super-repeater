@@ -41,6 +41,7 @@ public class ClassLoaderFactory {
 
     public Class compiler(File file) throws ClassNotFoundException, IOException {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
+        //这里45有一次null
         javac.run(null, null, err,
                 "-encoding", "UTF-8",
                 "-classpath", file.getAbsolutePath(),

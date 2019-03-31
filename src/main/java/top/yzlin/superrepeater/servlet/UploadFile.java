@@ -157,7 +157,7 @@ public class UploadFile {
             return "你怕不是没有选文件";
         }
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
-        if (file.isEmpty() && fileSuffix.equals(suffix)) {
+        if (file.isEmpty() || !fileSuffix.equals(suffix)) {
             return "无效文件";
         }
         return null;
