@@ -79,4 +79,6 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean, Init
         eventMap.clear();
         eventMap = null;
     }
+
+
 }

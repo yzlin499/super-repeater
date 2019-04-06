@@ -62,6 +62,15 @@ public class SimpleHttpAPI {
 
     }
 
+    public void lifeAddOneSeconds() {
+        if (apiClient.isClosed()) {
+            apiClient.reconnect();
+        }
+        if (eventClient.isClosed()) {
+            eventClient.reconnect();
+        }
+    }
+
     public void close() {
         destruct();
         apiClient.close();
