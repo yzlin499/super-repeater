@@ -26,7 +26,7 @@ public class ReadLogger {
 
     @RequestMapping("/log/src/{name}")
     public ResponseEntity<Object> getLog(@PathVariable("name") String name) throws FileNotFoundException {
-        File f = loggerManager.getLogFile(name + ".js");
+        File f = loggerManager.getLogFile(name);
         if (f == null) {
             return ResponseEntity.ok().body("无法获取文件");
         } else {
@@ -38,7 +38,7 @@ public class ReadLogger {
     public String testLog(@PathVariable("name") String name,
                           @RequestParam(value = "line", required = false, defaultValue = "30") int line,
                           Model model) throws IOException {
-        File f = loggerManager.getLogFile(name + ".js");
+        File f = loggerManager.getLogFile(name);
         List<String> list;
         if (f == null) {
             list = Collections.singletonList("没有任何的日志记录哦！");
