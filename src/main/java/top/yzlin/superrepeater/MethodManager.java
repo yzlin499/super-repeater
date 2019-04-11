@@ -64,10 +64,13 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean, Init
         addAllEvent(m);
     }
 
-    public MethodEvent addEvent(String name, MethodEvent methodEvent) {
+    public void addEvent(String name, MethodEvent methodEvent) {
         MethodEventAop m = new MethodEventAop(methodEvent);
         m.setLoggerManager(loggerManager);
-        return eventMap.put(name, m);
+        MethodEvent event = eventMap.put(name, m);
+        if (event != null) {
+            event.destroy();
+        }
     }
 
     public MethodEvent removeEvent(String name) {

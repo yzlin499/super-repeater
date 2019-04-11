@@ -44,4 +44,11 @@ public class MethodEventAop implements MethodEvent {
             logOperate.log(e);
         }
     }
+
+    @Override
+    public void destroy() {
+        methodEvent.destroy();
+        methodEvent = null;
+        logOperate = null;
+    }
 }

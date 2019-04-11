@@ -9,4 +9,7 @@ public interface MethodEvent {
     boolean check(JSONObject data);
 
     void operate(JSONObject data);
+
+    default void destroy() {
+    }
 }

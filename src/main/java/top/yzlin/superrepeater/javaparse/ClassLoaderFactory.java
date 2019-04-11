@@ -13,6 +13,7 @@ import java.io.IOException;
 public class ClassLoaderFactory {
     private JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
     private String classpath;
+    private String systemPath = System.getProperty("java.class.path");
     private File classpathFile;
     private File javapath;
 
@@ -44,7 +45,7 @@ public class ClassLoaderFactory {
         //这里45有一次null
         javac.run(null, null, err,
                 "-encoding", "UTF-8",
-                "-classpath", file.getAbsolutePath(),
+                "-classpath", systemPath + ";" + file.getAbsolutePath(),
                 "-d", classpath, file.getAbsolutePath());
         if (err.size() > 0) {
             throw new IOException(err.toString());

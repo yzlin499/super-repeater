@@ -8,3 +8,4 @@ user:
   privateKey: praiseBang
   javapath: C:/repeater/java
   classpath: C:/repeater/class
+  dbpath: C:/repeater/db

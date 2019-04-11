@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 import top.yzlin.superrepeater.LanguageParse;
 import top.yzlin.superrepeater.MethodEvent;
 import top.yzlin.superrepeater.SimpleHttpAPI;
+import top.yzlin.superrepeater.database.DBManager;
 import top.yzlin.superrepeater.log.LoggerManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 
 @Component
 public class JavaParse implements LanguageParse {
@@ -18,6 +20,12 @@ public class JavaParse implements LanguageParse {
     private LoggerManager loggerManager;
     private ClassLoaderFactory loaderFactory;
     private SimpleHttpAPI simpleHttpAPI;
+    private DBManager dbManager;
+
+    @Autowired
+    public void setDbManager(DBManager dbManager) {
+        this.dbManager = dbManager;
+    }
 
     @Autowired
     public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
@@ -42,14 +50,17 @@ public class JavaParse implements LanguageParse {
     }
 
     @Override
-    public MethodEvent parse(File file) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+    public MethodEvent parse(File file) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, SQLException {
         String name = file.getName();
         name = name.substring(0, name.lastIndexOf('.'));
-        JavaMethodEvent m = new JavaMethodEvent(loaderFactory.compiler(name),
-                groupID,
-                loggerManager.getLogOperate(file.getName()),
-                simpleHttpAPI);
+        JavaMethodEvent m = new JavaMethodEvent();
         m.setName(file.getName());
+        m.setGroupID(groupID);
+        m.setSimpleHttpAPI(simpleHttpAPI);
+        m.setClazz(loaderFactory.compiler(name));
+        m.setLogOperate(loggerManager.getLogOperate(file.getName()));
+        m.setDbManager(dbManager);
+        m.init();
         return m;
     }
 

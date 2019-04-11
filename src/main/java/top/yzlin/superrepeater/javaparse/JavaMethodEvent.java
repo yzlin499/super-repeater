@@ -3,11 +3,14 @@ package top.yzlin.superrepeater.javaparse;
 import com.alibaba.fastjson.JSONObject;
 import top.yzlin.superrepeater.BaseMethodEvent;
 import top.yzlin.superrepeater.SimpleHttpAPI;
+import top.yzlin.superrepeater.database.DBManager;
 import top.yzlin.superrepeater.log.LogOperate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -22,26 +25,53 @@ public class JavaMethodEvent extends BaseMethodEvent {
     private LogOperate logOperate;
     private SimpleHttpAPI simpleHttpAPI;
     private Class clazz;
+    private DBManager dbManager;
 
-    public JavaMethodEvent(Class clazz,
-                           String groupID,
-                           LogOperate logOperate,
-                           SimpleHttpAPI simpleHttpAPI) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public void setDbManager(DBManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
+    public void setGroupID(String groupID) {
         this.groupID = groupID;
+    }
+
+    public void setLogOperate(LogOperate logOperate) {
         this.logOperate = logOperate;
+    }
+
+    public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
         this.simpleHttpAPI = simpleHttpAPI;
+    }
+
+    public void setClazz(Class clazz) throws IllegalAccessException, InstantiationException {
         this.clazz = clazz;
         this.instance = clazz.newInstance();
+    }
 
+    private void initProperty() throws InvocationTargetException, IllegalAccessException, SQLException, InstantiationException {
         setProperty("setGroupID", String.class, groupID);
         setProperty("setLogOperate", Consumer.class, logOperate::log);
         setProperty("setSendGroupMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendGroupMsg(g.toString(), m.toString()));
         setProperty("setSendDiscussMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendDiscussMsg(g.toString(), m.toString()));
         setProperty("setSendPersonMsg", BiConsumer.class, (g, m) -> simpleHttpAPI.sendPersonMsg(g.toString(), m.toString()));
-        init();
+        try {
+            Method setConnection = clazz.getMethod("setConnection", Connection.class);
+            try {
+                Method initDataBase = clazz.getMethod("initDataBase");
+                boolean existsDB = dbManager.isExistsDB(getName());
+                setConnection.invoke(instance, dbManager.createDBConnection(getName()));
+                if (!existsDB) {
+                    initDataBase.invoke(instance);
+                }
+            } catch (NoSuchMethodException e) {
+                throw new InstantiationException("有setConnection但是没有initDataBase");
+            }
+        } catch (NoSuchMethodException ignored) {
+        }
     }
 
-    private void init() throws InstantiationException {
+    public void init() throws InstantiationException, InvocationTargetException, IllegalAccessException, SQLException {
+        initProperty();
         Map<String, Method> methodMap = Stream.of(clazz.getMethods())
                 .collect(Collectors.toMap(Method::getName, v -> v, (o1, o2) -> o1));
 
