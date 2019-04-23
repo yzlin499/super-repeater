@@ -9,3 +9,6 @@ user:
   javapath: C:/repeater/java
   classpath: C:/repeater/class
   dbpath: C:/repeater/db
+
+loca:
+  classpath: C:/Users/Administrator/Desktop/super-repeater-0.0.1-SNAPSHOT.jar

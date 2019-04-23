@@ -1,6 +1,5 @@
 package top.yzlin.superrepeater;
 
-import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +21,8 @@ public class SuperRepeaterApplicationTests {
 
     @Test
     public void contextLoads() throws Exception {
-        JSONObject j = new JSONObject()
-                .fluentPut("message", "asdasdasdsa")
-                .fluentPut("user_id", "123456789");
-        MethodEvent parse = javaParse.parse(javaClass.getFiles()[0]);
-        parse.operate(j);
+//        NoClassDefFoundError
+        System.out.println(ClassLoader.getSystemClassLoader().loadClass("com.alibaba.fastjson.JSONObject"));
     }
 
 }

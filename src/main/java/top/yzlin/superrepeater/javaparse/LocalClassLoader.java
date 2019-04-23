@@ -1,5 +1,7 @@
 package top.yzlin.superrepeater.javaparse;
 
+import top.yzlin.tools.Tools;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,7 @@ public class LocalClassLoader extends ClassLoader {
         this.classpath = classpath;
         this.className = className;
     }
+
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
@@ -44,7 +47,7 @@ public class LocalClassLoader extends ClassLoader {
         if (Objects.equals(className, name)) {
             return findClass(name);
         }
-        return super.loadClass(name);
+        return Tools.class.getClassLoader().loadClass(name);
     }
 
     public Class<?> loadClass() throws ClassNotFoundException {

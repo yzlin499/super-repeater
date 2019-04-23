@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@Component
+@Component("jsParse")
 public class JSParse implements LanguageParse {
     private ScriptEngineManager manager = new ScriptEngineManager();
     private SimpleHttpAPI simpleHttpAPI;

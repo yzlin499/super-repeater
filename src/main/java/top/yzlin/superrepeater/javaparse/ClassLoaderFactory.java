@@ -8,12 +8,14 @@ import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class ClassLoaderFactory {
     private JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
     private String classpath;
-    private String systemPath = System.getProperty("java.class.path");
+    private String systemPath;
     private File classpathFile;
     private File javapath;
 
@@ -23,6 +25,24 @@ public class ClassLoaderFactory {
             file.mkdirs();
         }
         return file;
+    }
+
+    @Value("${loca.classpath}")
+    public void setSystemPath(String systemPath) {
+        if (systemPath != null && !"".equals(systemPath)) {
+            File file = new File(systemPath);
+            if (file.exists()) {
+                if (file.isDirectory()) {
+                    this.systemPath = Stream.of(file.listFiles())
+                            .map(File::getAbsolutePath)
+                            .collect(Collectors.joining(";"));
+                } else if (file.isFile()) {
+                    this.systemPath = systemPath;
+                }
+            }
+            return;
+        }
+        this.systemPath = System.getProperty("java.class.path");
     }
 
     @Value("${user.classpath}")
@@ -43,6 +63,7 @@ public class ClassLoaderFactory {
     public Class compiler(File file) throws ClassNotFoundException, IOException {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
         //这里45有一次null
+        System.out.println(systemPath + ";" + file.getAbsolutePath());
         javac.run(null, null, err,
                 "-encoding", "UTF-8",
                 "-classpath", systemPath + ";" + file.getAbsolutePath(),

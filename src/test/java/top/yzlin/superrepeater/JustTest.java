@@ -22,6 +22,7 @@ public class JustTest {
         ScriptEngine engine = manager.getEngineByName("javascript");
         FileReader reader = new FileReader(ResourceUtils.getFile("classpath:js/TestJS.js"));
 
+
         engine.eval(reader);
         //获取最外层的赞美棒哥节点
         ScriptObjectMirror s = (ScriptObjectMirror) engine.get("praiseBang");

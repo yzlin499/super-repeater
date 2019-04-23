@@ -1,30 +1,32 @@
 package top.yzlin.superrepeater;
 
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import top.yzlin.cqrobotsdk.HttpAPICode;
 import top.yzlin.cqrobotsdk.JSONWebSocketClient;
 
 import java.util.function.Consumer;
 
 
-public class SimpleHttpAPI {
+@Component
+public class SimpleHttpAPI implements InitializingBean {
     private JSONWebSocketClient eventClient;
     private JSONWebSocketClient apiClient;
+    private String port;
 
-
-    public SimpleHttpAPI(int port) {
-        this(Integer.toString(port));
-    }
-
-    public SimpleHttpAPI(String port) {
-        this("ws://0.0.0.0", port);
-    }
-
-    public SimpleHttpAPI(String wsPath, String port) {
-        eventClient = new JSONWebSocketClient(wsPath + ':' + port + "/event/");
-        apiClient = new JSONWebSocketClient(wsPath + ':' + port + "/api/");
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        eventClient = new JSONWebSocketClient("ws://0.0.0.0:" + port + "/event/");
+        apiClient = new JSONWebSocketClient("ws://0.0.0.0:" + port + "/api/");
         eventClient.connect();
         apiClient.connect();
+    }
+
+    @Value("${cqRobot.port}")
+    public void setPort(String port) {
+        this.port = port;
     }
 
     public void setOnMessage(Consumer<JSONObject> onMessage) {
