@@ -18,8 +18,8 @@ public class PythonMethodEvent extends BaseMethodEvent {
     private String groupID;
     private LogOperate logOperate;
     private SimpleHttpAPI simpleHttpAPI;
-    private PythonInterpreter interpreter;
     private DBManager dbManager;
+    private PythonInterpreter interpreter;
 
     public void setInterpreter(PythonInterpreter interpreter) {
         this.interpreter = interpreter;
@@ -46,8 +46,7 @@ public class PythonMethodEvent extends BaseMethodEvent {
         setCheckFunction(makeCheck(check));
         PyFunction operate = interpreter.get("operate", PyFunction.class);
         setOperateFunction(makeOperate(operate));
-
-
+        interpreter.set("praiseBang", Py.java2py(new PythonTools(groupID, logOperate, simpleHttpAPI, dbManager)));
     }
 
 
