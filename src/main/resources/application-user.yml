@@ -3,12 +3,13 @@ cqRobot:
 
 user:
   groupID: 730074397
+  privateKey: praiseBang
   jspath: C:/repeater/js
   logpath: C:/repeater/log
-  privateKey: praiseBang
   javapath: C:/repeater/java
   classpath: C:/repeater/class
   dbpath: C:/repeater/db
+  pythonpath: C:/repeater/python
 
 loca:
   classpath: C:/Users/Administrator/Desktop/super-repeater-0.0.1-SNAPSHOT.jar

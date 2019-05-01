@@ -11,11 +11,11 @@ import top.yzlin.superrepeater.javaparse.JavaParse;
 import top.yzlin.superrepeater.jsparse.JSFile;
 import top.yzlin.superrepeater.jsparse.JSParse;
 import top.yzlin.superrepeater.log.LoggerManager;
+import top.yzlin.superrepeater.pythonparse.PythonFile;
+import top.yzlin.superrepeater.pythonparse.PythonParse;
 import top.yzlin.tools.Tools;
 
 import javax.annotation.PostConstruct;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +32,18 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     private JSFile jsFile;
     private JavaParse javaParse;
     private JavaClass javaClass;
+    private PythonFile pythonFile;
+    private PythonParse pythonParse;
+
+    @Autowired
+    public void setPythonFile(PythonFile pythonFile) {
+        this.pythonFile = pythonFile;
+    }
+
+    @Autowired
+    public void setPythonParse(PythonParse pythonParse) {
+        this.pythonParse = pythonParse;
+    }
 
     @Autowired
     public void setSimpleHttpAPI(SimpleHttpAPI simpleHttpAPI) {
@@ -89,26 +101,21 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     @PostConstruct
     public void afterPropertiesSet() {
         Map<String, MethodEvent> eventMap = new HashMap<>();
-        eventMap.putAll(Stream.of(jsFile.getFiles())
-                .map(f -> {
-                    try {
-                        return jsParse.parse(f);
-                    } catch (FileNotFoundException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }).filter(Objects::nonNull)
-                .collect(Collectors.toMap(MethodEvent::getName, v -> v)));
-        eventMap.putAll(Stream.of(javaClass.getFiles())
-                .map(f -> {
-                    try {
-                        return javaParse.parse(f);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }).filter(Objects::nonNull)
-                .collect(Collectors.toMap(MethodEvent::getName, v -> v)));
+        LanguageFile[] lfs = new LanguageFile[]{jsFile, javaClass, pythonFile};
+        LanguageParse[] lps = new LanguageParse[]{jsParse, javaParse, pythonParse};
+        for (int i = 0; i < lfs.length; i++) {
+            int finalI = i;
+            eventMap.putAll(Stream.of(lfs[finalI].getFiles())
+                    .map(f -> {
+                        try {
+                            return lps[finalI].parse(f);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }).filter(Objects::nonNull)
+                    .collect(Collectors.toMap(MethodEvent::getName, v -> v)));
+        }
         this.eventMap = new HashMap<>(eventMap.size());
         System.out.println(eventMap);
         addAllEvent(eventMap);

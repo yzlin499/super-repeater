@@ -3,13 +3,14 @@ package top.yzlin.superrepeater.jsparse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import top.yzlin.superrepeater.LanguageFile;
 import top.yzlin.superrepeater.Tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 @Component
-public class JSFile {
+public class JSFile implements LanguageFile {
     private File[] files;
 
     @Value("${user.jspath}")
@@ -28,6 +29,7 @@ public class JSFile {
         }
     }
 
+    @Override
     public File[] getFiles() {
         return files;
     }

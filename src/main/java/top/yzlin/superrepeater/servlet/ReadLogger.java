@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import top.yzlin.superrepeater.log.LoggerManager;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ReadLogger {
             String[] strings = new String[line];
             int index = -1;
             FileInputStream fis = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(fis, "utf-8");
+            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             BufferedReader bis = new BufferedReader(isr);
             String temp;
             while ((temp = bis.readLine()) != null) {

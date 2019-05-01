@@ -1,4 +1,4 @@
-package top.yzlin.superrepeater.javaparse;
+package top.yzlin.superrepeater.pythonparse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,15 +10,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 @Component
-public class JavaClass implements LanguageFile {
+public class PythonFile implements LanguageFile {
+
     private File[] files;
 
-    @Value("${user.javapath}")
-    public void setJavapath(String javapath) {
+    @Value("${user.pythonpath}")
+    public void setPythonpath(String pythonpath) {
         try {
-            File path = ResourceUtils.getFile(javapath);
+            File path = ResourceUtils.getFile(pythonpath);
             if (path.exists()) {
-                files = path.listFiles(Tools.filterBySuffix("java"));
+                files = path.listFiles(Tools.filterBySuffix("py"));
             } else {
                 path.mkdirs();
                 files = new File[0];
