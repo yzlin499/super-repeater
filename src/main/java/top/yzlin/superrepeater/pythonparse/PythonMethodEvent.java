@@ -63,7 +63,7 @@ public class PythonMethodEvent extends BaseMethodEvent {
             } else if (pyObject instanceof PyInteger) {
                 return ((PyInteger) pyObject).getValue() == 1;
             } else if (pyObject instanceof PyString) {
-                return Objects.equals(pyObject.toString(), j.getString("message"));
+                return Objects.equals(((PyString) pyObject).decode("utf-8").toString(), j.getString("message"));
             } else {
                 return false;
             }
@@ -78,7 +78,9 @@ public class PythonMethodEvent extends BaseMethodEvent {
         }
         return j -> {
             PyObject pyObject = makeParam(argNames, operate, j);
-            if (!(pyObject instanceof PyNone)) {
+            if (pyObject instanceof PyString) {
+                simpleHttpAPI.sendGroupMsg(groupID, ((PyString) pyObject).decode("utf-8").toString());
+            } else if (!(pyObject instanceof PyNone)) {
                 simpleHttpAPI.sendGroupMsg(groupID, pyObject.toString());
             }
         };
@@ -88,7 +90,7 @@ public class PythonMethodEvent extends BaseMethodEvent {
         PyObject[] argObj = new PyObject[argNames.length];
         for (int i = 0; i < argObj.length; i++) {
             String a = j.getString(argNames[i]);
-            argObj[i] = a != null ? new PyString(a) : None;
+            argObj[i] = a != null ? Py.newStringUTF8(a) : None;
         }
         return check.__call__(argObj, argNames);
     }

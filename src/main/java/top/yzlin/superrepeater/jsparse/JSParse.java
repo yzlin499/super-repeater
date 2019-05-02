@@ -14,6 +14,7 @@ import top.yzlin.superrepeater.log.LoggerManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -57,7 +58,7 @@ public class JSParse implements LanguageParse {
         ScriptEngine engine = manager.getEngineByName("javascript");
 
         FileInputStream fis = new FileInputStream(file);
-        InputStreamReader isr = new InputStreamReader(fis, "utf-8");
+        InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
         try {
             engine.eval(isr);
         } catch (Exception e) {
