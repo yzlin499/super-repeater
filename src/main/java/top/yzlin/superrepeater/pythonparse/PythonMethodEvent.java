@@ -51,11 +51,7 @@ public class PythonMethodEvent extends BaseMethodEvent {
 
 
     private Predicate<JSONObject> makeCheck(PyFunction check) {
-        PyTuple args = (PyTuple) check.__code__.__getattr__("co_varnames");
-        String[] argNames = new String[args.size()];
-        for (int i = 0; i < argNames.length; i++) {
-            argNames[i] = args.get(i).toString();
-        }
+        String[] argNames = getArgNames(check);
         return j -> {
             PyObject pyObject = makeParam(argNames, check, j);
             if (pyObject instanceof PyBoolean) {
@@ -70,16 +66,28 @@ public class PythonMethodEvent extends BaseMethodEvent {
         };
     }
 
-    private Consumer<JSONObject> makeOperate(PyFunction operate) {
-        PyTuple args = (PyTuple) operate.__code__.__getattr__("co_varnames");
-        String[] argNames = new String[args.size()];
+    private String[] getArgNames(PyFunction check) {
+        PyTuple args = (PyTuple) check.__code__.__getattr__("co_varnames");
+        PyInteger pyInteger = (PyInteger) check.__code__.__getattr__("co_argcount");
+        String[] argNames = new String[pyInteger.getValue()];
         for (int i = 0; i < argNames.length; i++) {
             argNames[i] = args.get(i).toString();
         }
+        return argNames;
+    }
+
+    private Consumer<JSONObject> makeOperate(PyFunction operate) {
+        String[] argNames = getArgNames(operate);
         return j -> {
             PyObject pyObject = makeParam(argNames, operate, j);
             if (pyObject instanceof PyString) {
-                simpleHttpAPI.sendGroupMsg(groupID, ((PyString) pyObject).decode("utf-8").toString());
+                String msg;
+                try {
+                    msg = ((PyString) pyObject).decode("utf-8", "Unicode").toString();
+                } catch (PyException e) {
+                    msg = pyObject.toString();
+                }
+                simpleHttpAPI.sendGroupMsg(groupID, msg);
             } else if (!(pyObject instanceof PyNone)) {
                 simpleHttpAPI.sendGroupMsg(groupID, pyObject.toString());
             }

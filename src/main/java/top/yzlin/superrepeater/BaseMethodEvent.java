@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class BaseMethodEvent implements MethodEvent {
+    private int priority = 1;
     private String name;
     private Predicate<JSONObject> checkFunction;
     private Consumer<JSONObject> operateFunction;
@@ -35,5 +36,14 @@ public class BaseMethodEvent implements MethodEvent {
     @Override
     public void operate(JSONObject jsonObject) {
         operateFunction.accept(jsonObject);
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 }

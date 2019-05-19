@@ -68,6 +68,8 @@ public class PythonParse implements LanguageParse, InitializingBean {
         while ((tmp = isr.read()) != -1) {
             stringBuilder.append((char) tmp);
         }
+        isr.close();
+        fis.close();
         PythonInterpreter interpreter = new PythonInterpreter();
         interpreter.exec(Py.newStringUTF8(stringBuilder.toString()));
         PythonMethodEvent methodEvent = new PythonMethodEvent();

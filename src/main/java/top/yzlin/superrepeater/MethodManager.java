@@ -16,9 +16,7 @@ import top.yzlin.superrepeater.pythonparse.PythonParse;
 import top.yzlin.tools.Tools;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +25,7 @@ import java.util.stream.Stream;
 public class MethodManager implements Consumer<JSONObject>, DisposableBean {
     private LoggerManager loggerManager;
     private Map<String, MethodEvent> eventMap = new HashMap<>();
+    private final List<MethodEvent> tempEventList = new ArrayList<>(5);
     private long groupID;
     private JSParse jsParse;
     private JSFile jsFile;
@@ -82,14 +81,32 @@ public class MethodManager implements Consumer<JSONObject>, DisposableBean {
 
     @Override
     public void accept(JSONObject jsonObject) {
-        if (jsonObject.getLongValue("group_id") == groupID) {
-            eventMap.forEach((k, v) -> {
-                if (v.check(jsonObject)) {
-                    v.operate(jsonObject);
-                    //防止被腾讯封号
-                    Tools.sleep(500);
+        synchronized (tempEventList) {
+            tempEventList.clear();
+            if (jsonObject.getLongValue("group_id") == groupID) {
+                eventMap.forEach((k, v) -> {
+                    if (v.check(jsonObject)) {
+                        tempEventList.add(v);
+                    }
+                });
+            }
+            if (tempEventList.size() > 0) {
+                tempEventList.sort(Comparator.comparingInt(MethodEvent::getPriority).reversed());
+                if (tempEventList.get(0).getPriority() >= 0) {
+                    for (MethodEvent methodEvent : tempEventList) {
+                        if (methodEvent.getPriority() >= 0) {
+                            methodEvent.operate(jsonObject);
+                            Tools.sleep(500);
+                        }
+                    }
+                } else {
+                    for (MethodEvent methodEvent : tempEventList) {
+                        methodEvent.operate(jsonObject);
+                        Tools.sleep(500);
+                    }
                 }
-            });
+
+            }
         }
     }
 

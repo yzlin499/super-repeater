@@ -4,6 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 
 public interface MethodEvent {
 
+    default int getPriority() {
+        return 1;
+    }
+
     String getName();
 
     boolean check(JSONObject data);

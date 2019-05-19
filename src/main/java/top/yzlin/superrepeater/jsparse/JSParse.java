@@ -73,6 +73,19 @@ public class JSParse implements LanguageParse {
         if (s == null) {
             return null;
         }
+
+        Object priority = s.get("priority");
+        if (priority != null) {
+            if (priority instanceof Number) {
+                jsMethodEvent.setPriority(((Number) priority).intValue());
+            } else if (priority instanceof String) {
+                try {
+                    jsMethodEvent.setPriority(Integer.parseInt(String.valueOf(priority)));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
         //注入机器人的操作函数
         injectionProperties(s, file.getName());
 

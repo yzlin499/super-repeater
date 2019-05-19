@@ -3,6 +3,7 @@ var praiseBang = {
     count: 1,
     threshold: 4,
     lastRecord: "",
+    priority: "aa",
     check: function (msg) {
         if (praiseBang.lastRecord === msg.message) {
             praiseBang.count++;
